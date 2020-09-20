@@ -1,0 +1,60 @@
+#!/bin/bash
+# export LC_ALL=C
+# Correrlo cada x minutos en el crontab:
+# */x * * * * /home/usuario/revisaserver
+
+Email="nombre@dominio.com, nombre2@dominio.com"
+# Porcentaje máximo de uso de memoria y disco
+MaxDisco=70
+MaxMem=70
+MaxProc=200
+
+# Duración entre emails de alerta en segundos:
+LapDisco=43200
+LapMem=14400
+LapProc=14400
+
+Equipo=$(hostname)
+Ahora=$(date +%s)
+
+# ===== Revisa Disco =====
+UltimaAlarma=$(cat /home/usuario/AlarmaDisco)
+Lapso=$(( Ahora-$UltimaAlarma ))
+if [ "$Lapso" -gt "$LapDisco" ] ; then
+  PctDisco=$(df / | grep / | awk '{ print $5}' | sed 's/%//g')
+  if [ "$PctDisco" -gt "$MaxDisco" ] ; then
+    mail -s 'Alarma en '$Equipo' disco al '$PctDisco'%' $Email << EOF
+La partición de root en $Equipo está muy llena $PctDisco%
+
+EOF
+    echo $Ahora>/home/usuario/AlarmaDisco
+  fi
+fi
+# ===== Revisa Memoria RAM =====
+UltimaAlarma=$(cat /home/usuario/AlarmaMem)
+Lapso=$(( Ahora-$UltimaAlarma ))
+if [ "$Lapso" -gt "$LapMem" ] ; then
+  PctMem=$(free | grep Mem | awk '{print $3/$2 * 100.0}')
+  PctMem=${PctMem%.*}
+  if [ "$PctMem" -gt "$MaxMem" ] ; then
+    mail -s 'Alarma en '$Equipo' memoria RAM al '$PctMem'%' $Email << EOF
+La memoria RAM en $Equipo está muy llena $PctMem%
+
+EOF
+    echo $Ahora>/home/usuario/AlarmaMem
+  fi
+fi
+
+# ==== REVISA PROCESOS ====
+UltimaAlarma=$(cat /home/usuario/AlarmaProc)
+Lapso=$(( Ahora-$UltimaAlarma ))
+if [ "$Lapso" -gt "$LapProc" ] ; then
+  R=$(ps -e | wc -l)
+  if [ $R -gt $MaxProc ] ; then
+    mail -s 'Alarma en '$Equipo' exceso de procesos: '$R $Email << EOF
+Exceso de procesos corriendo en $Equipo: $R procesos.
+
+EOF
+    echo $Ahora>/home/usuario/AlarmaProc
+  fi
+fi
