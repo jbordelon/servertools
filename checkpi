@@ -1,50 +1,50 @@
-#!/bin/bash 
-# JRB 29jun22 
+#!/bin/bash
+# JRB 29jun22
 
-# Ultimo inicio 
-Inicio=$(uptime -s) 
-echo "Ultimo Inicio:        $Inicio" 
+# Ultimo inicio
+Inicio=$(uptime -s | awk '{print $2,$1}')
+echo "Ultimo Inicio:        $Inicio"
 
-# Uptime 
-UpTime=$(uptime |awk -F'( |,)+' '{print $4}') 
-echo "Uptime:               $UpTime" 
- 
-# Uso del Disco 
-PctDisco=$(df / | grep / | awk '{ print $5}' | sed 's/%//g') 
-echo "Uso de disco:         $PctDisco%" 
+# Uptime
+UpTime=$(uptime |awk -F'( |,)+' '{print $4}')
+echo "Uptime:               $UpTime"
 
-# Uso de RAM 
-PctMem=$(printf "%.1f\n" $(free | grep Mem | awk '{print $3/$2 * 100}')) 
-echo "Uso de RAM:           $PctMem%" 
+# Uso del Disco
+PctDisco=$(df / | grep / | awk '{ print $5}' | sed 's/%//g')
+echo "Uso de disco:         $PctDisco%"
 
-# Numero de procesos sin contar el título, el script checkpi ps y wc 
-NumProc=`expr $(ps -e |wc -l) - 4` 
-echo "Número de procesos:   $NumProc" 
+# Uso de RAM
+PctMem=$(printf "%.1f\n" $(free | grep Mem | awk '{print $3/$2 * 100}'))
+echo "Uso de RAM:           $PctMem%"
 
-# Porcentaje uso CPU 
-UsoCpu=$(printf "%.1f\n" $(grep 'cpu ' /proc/stat | awk '{print ($2+$4)*100/($2+$4+$5)}')) 
-echo "Uso de CPU:           $UsoCpu%" 
+# Numero de procesos sin contar el título, el script checkpi ps y wc
+NumProc=`expr $(ps -e |wc -l) - 4`
+echo "Número de procesos:   $NumProc"
+
+# Porcentaje uso CPU
+UsoCpu=$(printf "%.1f\n" $(grep 'cpu ' /proc/stat | awk '{print ($2+$4)*100/($2+$4+$5)}'))
+echo "Uso de CPU:           $UsoCpu%"
 
 # Carga del CPU
-Carga=$(cat /proc/loadavg | awk '{ print $2}') 
-echo "Carga 5m:             $Carga" 
+Carga=$(cat /proc/loadavg | awk '{ print $2}')
+echo "Carga 5m:             $Carga"
 
-# Temperatura del CPU 
-T=$(printf "%.1f\n" $(cat /sys/class/thermal/thermal_zone0/temp | awk '{print $1/1000}')) 
-echo "Temperatura del CPU:  $TºC" 
+# Temperatura del CPU
+T=$(printf "%.1f\n" $(cat /sys/class/thermal/thermal_zone0/temp | awk '{print $1/1000}'))
+echo "Temperatura del CPU:  $TºC"
 
-# Paquetes instalados: 
-NumPaq=$(dpkg -l |grep i -c) 
-echo "Paquetes instalados:  $NumPaq" 
+# Paquetes instalados:
+NumPaq=$(dpkg -l |grep ii -c)
+echo "Paquetes instalados:  $NumPaq"
 
-# Versión de kernel: 
-Kernel=$(uname -r) 
-echo "Versión de kernel:    $Kernel" 
+# Versión de kernel:
+Kernel=$(uname -r)
+echo "Versión de kernel:    $Kernel"
 
-# Ultima actualización: 
-UltAct=$(tail -1 /var/log/apt/history.log | awk '{ print $2,$3}') 
-echo "Ultima Actualización: $UltAct" 
+# Ultima actualización:
+UltAct=$(ls -Artls /var/lib/dpkg/info |tail -1|awk '{print $9,$8,$7}')
+echo "Ultima Actualización: $UltAct"
 
-# Ultimo login: 
-UltLog=$(tac /var/log/auth.log | grep -v -e cron -e root | grep -m 1 "session opened" | awk '{ print $1,$2,$3,$11}') 
+# Ultimo login:
+UltLog=$(tac /var/log/auth.log | grep -v -e cron -e root | grep -m 1 "session opened" | awk '{ print $3,$2,$1,$11}')
 echo "Ultimo Login:         $UltLog"
