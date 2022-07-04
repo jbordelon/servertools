@@ -41,12 +41,44 @@ echo "Temperatura del CPU:    $TºC"
 
 echo
 
+# Hostname
+HostName=$(hostname)
+echo "Nombre del equipo:      $HostName"
+
+# MAC
+DirMac=$(cat /sys/class/net/eth0/address)
+# ip link show eth0 |grep link/ether|awk '{print $2}'
+echo "Dirección MAC:          $DirMac"
+
+# IP
+# DirIp=$(hostname -I)
+DirIp=$(ip a show eth0 |grep inet|awk '{print $2}')
+echo "Dirección IP/Máscara:   $DirIp"
+
+# Gateway
+DirGw=$(route |grep default|awk '{print $2}')
+echo "Dirección Gateway:      $DirGw"
+
+# Servidor DNS
+DirDns=$(cat /etc/resolv.conf |grep nameserver |awk '{print $2}')
+echo "Servidor DNS:           $DirDns"
+
+# Servidor NTP
+DirNtp=$(timedatectl timesync-status |grep Server|awk '{print $2}')
+echo "Servidor NTP:           $DirNtp"
+SynNtp=$(timedatectl |grep "System clock synchronized"|awk '{print $4}')
+echo "Reloj Sincronizado:     $SynNtp"
+
+echo
+
 # Ultimo inicio
 Inicio=$(uptime -s | awk '{print $2,$1}')
 echo "Ultimo Inicio:          $Inicio"
 
 # Uptime
-UpTime=$(uptime |awk -F'( |,)+' '{print $4}')
+UpTime=$(uptime | awk -F'( |,|:)+' '{d=h=m=0; if ($7=="min") m=$6;
+  else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}}
+  {print d+0,"días,",h+0,"horas,",m+0,"minutos."}')
 echo "Uptime:                 $UpTime"
 
 # Ultima actualización:
