@@ -1,4 +1,3 @@
-
 #!/bin/bash
 # JRB 29jun22
 echo
@@ -15,8 +14,11 @@ NumPaq=$(dpkg -l |grep ii -c)
 echo "Paquetes instalados:    $NumPaq"
 
 # Uso del Disco
-PctDisco=$(df / | grep / | awk '{ print $5}' | sed 's/%//g')
-echo "Uso de disco:           $PctDisco%"
+UsoDisco=$(df / | grep / )
+PctDisco=$(echo $UsoDisco | awk '{ print $5}' | sed 's/%//g')
+UsoDisco=$(printf "%.2f\n" $(echo $UsoDisco | awk '{ print $3/1024000}'))
+echo "Uso de disco:           "$UsoDisco" GB"
+echo "Porcentaje de disco:    "$PctDisco"%"
 
 echo
 
@@ -27,7 +29,9 @@ echo "Número de procesos:     $NumProc"
 # Uso de RAM
 TotMem=$(free | grep Mem)
 PctMem=$(printf "%.1f\n" $(echo $TotMem | awk '{print $3/$2 * 100}'))
-echo "Uso de RAM:             "$(printf "%.1f\n" $(echo $TotMem |awk '{print $3/1024}'))MiB $PctMem%
+TotMem=$(printf "%.1f\n" $(echo $TotMem |awk '{print $3/1024}'))
+echo "Uso de RAM:             "$TotMem" MiB"
+echo "Porcentaje de RAM:      "$PctMem"%"
 
 # Carga del CPU
 Carga=$(cat /proc/loadavg | awk '{ print $2}')
@@ -49,16 +53,13 @@ echo "Nombre del equipo:      $HostName"
 
 # MAC
 DirMac=$(cat /sys/class/net/enp9s0/address)
-# ip link show eth0 |grep link/ether|awk '{print $2}'
 echo "Dirección MAC:          $DirMac"
 
 # IP
-# DirIp=$(hostname -I)
 DirIp=$(ip a show enp9s0 |grep inet|awk NR==1'{print $2}')
 echo "Dirección IP/Máscara:   $DirIp"
 
 # Gateway
-#DirGw=$(route |grep default|awk '{print $2}')
 DirGw=$( ip r |awk NR==1'{print $3}')
 echo "Dirección Gateway:      $DirGw"
 
@@ -67,12 +68,10 @@ DirDns=$(cat /etc/resolv.conf |grep nameserver |awk NR==1'{print $2}')
 echo "Servidor DNS:           $DirDns"
 
 # Servidor NTP
-#DirNtp=$(timedatectl |grep Server|awk '{print $2}')
 DirNtp=$(ntpq -p |awk 'FNR==3{print $1}')
 echo "Servidor NTP:           "${DirNtp:1:15}
 SynNtp=$(timedatectl |grep "System clock synchronized"|awk '{print $4}')
 echo "Reloj Sincronizado:     $SynNtp"
-
 echo
 
 # Hora
@@ -85,20 +84,9 @@ echo "Ultimo Inicio:          $Inicio"
 
 # Uptime
 UpTime=$(uptime -p)
-#UpTime=$(
-#uptime | awk -F'( |,|:)+' '{d=h=m=0;
-# if ($9=="min") {d=$6;m=$8}
-# else {
-#  if ($8=="min") m=$7;
-#  else {
-#   if ($7~/^day/) {d=$6;h=$8;m=$9}
-#   else{h=$6;m=$7}
-#}}}
-#{print d+0,"d,",h+0,"hr,",m+0,"min"}')
 echo "Uptime:                 $UpTime"
 
 # Ultima actualización:
-# 4 -rw-r--r-- 1 root root     338 Aug 17 15:11 sntp.list
 UltAct=$(ls -Artls /var/lib/dpkg/info |tail -1|awk '{print $9,$8,$7}')
 echo "Ultima Actualización:   $UltAct"
 
