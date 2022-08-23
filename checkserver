@@ -3,8 +3,9 @@
 NomIf="enp9s0"
 echo
 
-Distro=$(lsb_release -d | awk '{print $2,$4}')
-echo "Distribución GNU/Linux: $Distro"
+# Distro=$(lsb_release -d | awk '{print $2,$4}')
+Distro=$(cat /etc/os-release | awk -F '"' NR==1'{print $2}')
+echo "Distribución:           $Distro"
 
 # Versión de kernel:
 Kernel=$(uname -r)
