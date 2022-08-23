@@ -16,8 +16,10 @@ echo "Paquetes instalados:    $NumPaq"
 
 # Uso del Disco
 UsoDisco=$(df / | grep / )
+TamDisco=$(printf "%.1f\n" $(echo $UsoDisco | awk '{ print $2/1024000}'))
 PctDisco=$(echo $UsoDisco | awk '{ print $5}' | sed 's/%//g')
 UsoDisco=$(printf "%.2f\n" $(echo $UsoDisco | awk '{ print $3/1024000}'))
+echo "Partición:              "$TamDisco" GiB"
 echo "Uso de disco:           "$UsoDisco" GiB"
 echo "Porcentaje de disco:    "$PctDisco"%"
 
@@ -29,9 +31,11 @@ echo "Número de procesos:     $NumProc"
 
 # Uso de RAM
 TotMem=$(free | grep Mem)
-PctMem=$(printf "%.1f\n" $(echo $TotMem | awk '{print $3/$2 * 100}'))
-TotMem=$(printf "%.1f\n" $(echo $TotMem |awk '{print $3/1024}'))
-echo "Uso de RAM:             "$TotMem" MiB"
+UsoMem=$(printf "%.1f\n" $(echo $TotMem |awk '{print $3/1024}'))
+TotMem=$(printf "%.0f\n" $(echo $TotMem |awk '{print $2/1024}'))
+PctMem=$(printf "%.1f\n" $(awk -v Uso=$UsoMem -v Tot=$TotMem 'BEGIN { print  ( 100 * Uso / Tot ) }'))
+echo "Total de RAM:           "$TotMem" MiB"
+echo "Uso de RAM:             "$UsoMem" MiB"
 echo "Porcentaje de RAM:      "$PctMem"%"
 
 # Carga del CPU
