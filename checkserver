@@ -18,7 +18,7 @@ echo "Paquetes instalados:    $NumPaq"
 UsoDisco=$(df / | grep / )
 PctDisco=$(echo $UsoDisco | awk '{ print $5}' | sed 's/%//g')
 UsoDisco=$(printf "%.2f\n" $(echo $UsoDisco | awk '{ print $3/1024000}'))
-echo "Uso de disco:           "$UsoDisco" GB"
+echo "Uso de disco:           "$UsoDisco" GiB"
 echo "Porcentaje de disco:    "$PctDisco"%"
 
 echo
