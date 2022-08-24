@@ -71,7 +71,8 @@ DirGw=$(ip r |awk NR==1'{print $3}')
 echo "Dirección Gateway:      $DirGw"
 
 # Servidor DNS
-DirDns=$(cat /etc/resolv.conf |grep nameserver |awk NR==1'{print $2}')
+# DirDns=$(cat /etc/resolv.conf |grep nameserver |awk NR==1'{print $2}')
+DirDns=$(systemd-resolve --status |grep "DNS Servers" |awk NR==1'{print $3}')
 echo "Servidor DNS:           $DirDns"
 
 # Servidor NTP
