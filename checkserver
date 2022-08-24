@@ -77,7 +77,10 @@ echo "Servidor DNS:           $DirDns"
 # Servidor NTP
 DirNtp=$(systemctl status systemd-timesyncd |grep "Status"|awk '{print $6,$7}')
 DirNtp=${DirNtp%??}
-echo "Servidor NTP:           $DirNtp"
+if [[ "$DirNtp" != "" ]]; then
+  echo "Servidor NTP:           $DirNtp"
+fi
+
 SynNtp=$(timedatectl |grep "System clock synchronized"|awk '{print $4}')
 echo "Reloj Sincronizado:     $SynNtp"
 echo
