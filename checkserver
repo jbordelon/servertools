@@ -1,5 +1,5 @@
 #!/bin/bash
-# JRB 29jun22
+# JRB 23ago22
 NomIf="eth0"
 echo
 
