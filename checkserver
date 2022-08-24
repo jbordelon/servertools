@@ -67,7 +67,7 @@ DirIp=$(ip a show $NomIf |grep inet|awk NR==1'{print $2}')
 echo "Dirección IP/Máscara:   $DirIp"
 
 # Gateway
-DirGw=$( ip r |awk NR==1'{print $3}')
+DirGw=$(ip r |awk NR==1'{print $3}')
 echo "Dirección Gateway:      $DirGw"
 
 # Servidor DNS
