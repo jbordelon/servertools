@@ -75,9 +75,8 @@ DirDns=$(cat /etc/resolv.conf |grep nameserver |awk NR==1'{print $2}')
 echo "Servidor DNS:           $DirDns"
 
 # Servidor NTP
-# DirNtp=$(ntpq -p |awk 'FNR==3{print $1}')
-# echo "Servidor NTP:           "${DirNtp:1:15}
-DirNtp=$(systemctl status systemd-timesyncd |grep "Status"|awk '{print $6}')
+DirNtp=$(systemctl status systemd-timesyncd |grep "Status"|awk '{print $6,$7}')
+DirNtp=${DirNtp%??}
 echo "Servidor NTP:           $DirNtp"
 SynNtp=$(timedatectl |grep "System clock synchronized"|awk '{print $4}')
 echo "Reloj Sincronizado:     $SynNtp"
@@ -101,7 +100,7 @@ echo "Ultima Actualización:   $UltAct"
 
 # Ultimo login:
 UltLog=$(tac /var/log/auth.log 2>/dev/null | grep -v -a -e cron -e root | \
-  grep -m 1 -a "session opened" | awk '{ print $3,$2,$1,$11}')
+  grep -m 1 -a "session opened" | awk '{print $3,$2,$1,$11}')
 if [[ "$UltLog" != "" ]]; then
   echo "Ultimo Login:           $UltLog"
 fi
