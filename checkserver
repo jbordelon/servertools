@@ -1,9 +1,9 @@
 #!/bin/bash
 # JRB 29jun22
-NomIf="enp9s0"
+NomIf="eth0"
 echo
 
-Distro=$(cat /etc/os-release | awk -F '"' NR==1'{print $2}')
+Distro=$(cat /etc/os-release | grep PRETTY_NAME | awk -F '"' '{print $2}')
 echo "Distribución:           $Distro"
 
 # Versión de kernel:
@@ -47,8 +47,10 @@ UsoCpu=$(printf "%.1f\n" $(grep 'cpu ' /proc/stat | awk '{print ($2+$4)*100/($2+
 echo "Uso de CPU:             $UsoCpu%"
 
 # Temperatura del CPU
-T=$(printf "%.1f\n" $(cat /sys/class/thermal/thermal_zone0/temp | awk '{print $1/1000}'))
-echo "Temperatura del CPU:    $TºC"
+T=$(printf "%.1f\n" $(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{print $1/1000}'))
+if [[ "$T" != "0.0" ]]; then
+  echo "Temperatura del CPU:    $TºC"
+fi
 
 echo
 
@@ -73,8 +75,10 @@ DirDns=$(cat /etc/resolv.conf |grep nameserver |awk NR==1'{print $2}')
 echo "Servidor DNS:           $DirDns"
 
 # Servidor NTP
-DirNtp=$(ntpq -p |awk 'FNR==3{print $1}')
-echo "Servidor NTP:           "${DirNtp:1:15}
+# DirNtp=$(ntpq -p |awk 'FNR==3{print $1}')
+# echo "Servidor NTP:           "${DirNtp:1:15}
+DirNtp=$(systemctl status systemd-timesyncd |grep "Status"|awk '{print $6}')
+echo "Servidor NTP:           $DirNtp"
 SynNtp=$(timedatectl |grep "System clock synchronized"|awk '{print $4}')
 echo "Reloj Sincronizado:     $SynNtp"
 echo
@@ -96,8 +100,10 @@ UltAct=$(ls -Artls /var/lib/dpkg/info |tail -1|awk '{print $9,$8,$7}')
 echo "Ultima Actualización:   $UltAct"
 
 # Ultimo login:
-UltLog=$(tac /var/log/auth.log | grep -v -a -e cron -e root | \
+UltLog=$(tac /var/log/auth.log 2>/dev/null | grep -v -a -e cron -e root | \
   grep -m 1 -a "session opened" | awk '{ print $3,$2,$1,$11}')
-echo "Ultimo Login:           $UltLog"
+if [[ "$UltLog" != "" ]]; then
+  echo "Ultimo Login:           $UltLog"
+fi
 
 echo
