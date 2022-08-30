@@ -1,0 +1,32 @@
+#!/bin/bash
+# JRB 30ago22
+
+# Virtual core pointer id=2 [master pointer (3)]
+# Virtual core XTEST pointer id=4 [slave pointer (2)]
+# IDEACOM IDC 6651 id=9 [slave pointer (2)]
+# SynPS/2 Synaptics TouchPad id=12 [slave pointer (2)]
+# Virtual core keyboard id=3 [master keyboard (2)]
+# Virtual core XTEST keyboard id=5 [slave keyboard (3)]
+# Video Bus id=6 [slave keyboard (3)]
+# Power Button id=7 [slave keyboard (3)]
+# Sleep Button id=8 [slave keyboard (3)]
+# Dell WMI hotkeys id=10 [slave keyboard (3)]
+# AT Translated Set 2 keyboard id=11 [slave keyboard (3)]
+
+Listado=$(DISPLAY=:0 XAUTHORITY=/home/pi/.Xauthority xinput --list)
+
+Busca="AT Translated Set 2 keyboard"
+Linea=${Listado#*$Busca}
+Id=$(echo $Linea |awk -F'=| ' '{ print $2}')
+Master=$(echo $Linea |awk -F'\(|\)' '{ print $2}')
+echo "Activando $Busca Id: $Id Master: $Master"
+DISPLAY=:0 XAUTHORITY=/home/pi/.Xauthority xinput reattach $Id 3
+
+Busca="SynPS/2 Synaptics TouchPad"
+Linea=${Listado#*$Busca}
+Id=$(echo $Linea |awk -F'=| ' '{ print $2}')
+Master=$(echo $Linea |awk -F'\(|\)' '{ print $2}')
+echo "Activando $Busca Id: $Id Master: $Master"
+DISPLAY=:0 XAUTHORITY=/home/pi/.Xauthority xinput reattach $Id 2
+
+DISPLAY=:0 XAUTHORITY=/home/pi/.Xauthority xinput --list
