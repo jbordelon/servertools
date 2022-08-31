@@ -105,6 +105,9 @@ echo "Ultima Actualización:   $UltAct"
 # Ultimo login:
 UltLog=$(tac /var/log/auth.log 2>/dev/null | grep -v -a -e cron -e root | \
   grep -m 1 -a "session opened" | awk '{print $3,$2,$1,$11}')
+if [ "$UltLog" = "" ] ; then
+  UltLog=$(tac /var/log/auth.log.1 | grep -v -e cron -e root | grep -m 1 "session opened" | awk '{ print $3,$2,$1,$11}')
+fi
 if [[ "$UltLog" != "" ]]; then
   echo "Ultimo Login:           $UltLog"
 fi
