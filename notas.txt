@@ -1,0 +1,3 @@
+Para copiar múltiples archivos con diferentes extensiones:
+
+for i in File1.*; do echo cp {File1,File2}."${i#*.}"; done
