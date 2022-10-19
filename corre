@@ -1,0 +1,16 @@
+#!/bin/bash
+# Tiempo en segundos
+
+function cuenta(){
+  for i in {600..1}; do
+    echo -en "-> $i  \r"
+    sleep 1
+  done
+  echo "      "
+}
+
+for (( ; ; )) do
+  # Pone salida en pantalla y en un file de log
+  python3 /home/usuario/programa.py | tee /home/usuario/programa.log
+  cuenta
+done
